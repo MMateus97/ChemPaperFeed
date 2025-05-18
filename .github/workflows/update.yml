@@ -2,8 +2,8 @@ name: Update Papers Daily
 
 on:
   schedule:
-    - cron: '0 6 * * *'  # Runs daily at 6:00 AM UTC
-  workflow_dispatch:     # Allows manual run from GitHub
+    - cron: '0 6 * * *'
+  workflow_dispatch:
 
 jobs:
   update:
@@ -22,12 +22,12 @@ jobs:
       - name: Run the script
         run: node index.js
 
-      - name: Commit and push changes
+      - name: Commit and push changes using PAT
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           git config --global user.name "MMateus97"
-          git config --global user.email "miguelmateus1997@gmail.com"  # Replace with your GitHub email
+          git config --global user.email "miguelmateus1997@gmail.com"
           git add papers.json
           git commit -m "📄 Auto-update papers.json" || echo "No changes"
           git remote set-url origin https://MMateus97:${GH_PAT}@github.com/MMateus97/ChemPaperFeed.git

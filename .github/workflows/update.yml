@@ -1,0 +1,31 @@
+name: Update Papers Daily
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Runs daily at 6:00 AM UTC
+  workflow_dispatch:     # Allows manual run from GitHub
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run the script
+        run: node index.js
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add papers.json
+          git commit -m "📄 Update papers.json [auto]" || echo "No changes to commit"
+          git push

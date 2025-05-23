@@ -18,7 +18,7 @@ function renderPapers(papers, container) {
       : "";
 
     const isSaved = saved.has(paper.doi);
-    const savedText = isSaved ? "★ Saved" : "☆ Save";
+    const savedText = isSaved ? "★ Saved" : "⭐ Save";
 
     div.innerHTML = `
       <h3><a href="${paper.link}" target="_blank" rel="noopener noreferrer">${paper.title}</a></h3>

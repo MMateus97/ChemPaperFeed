@@ -175,7 +175,7 @@ def fetch_openalex_data(doi):
     import time
 
     api_url = f"https://api.openalex.org/works/https://doi.org/{quote(doi)}"
-    for attempt in range(5):  # Up to 5 retries
+    for attempt in range(2): 
         try:
             time.sleep(1.5 * (2 ** attempt))  # Exponential backoff
             r = requests.get(api_url, timeout=15)

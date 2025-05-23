@@ -21,7 +21,8 @@ jobs:
         run: pip install requests
 
       - name: Run fetch script
-        run: python fetch_crossref_metadata_final.py
+        run: python fetch_crossref_metadata.py
+
 
       - name: Commit new papers.json
         run: |

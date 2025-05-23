@@ -90,3 +90,56 @@ a:hover {
 .save-btn:hover {
   background: #ffefcc;
 }
+
+.layout {
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+main#papers {
+  flex: 1;
+}
+
+#sidebar {
+  width: 260px;
+  background: #f6f6f6;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.filter-group {
+  margin-bottom: 1.5rem;
+}
+
+.filter-group h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  color: #444;
+}
+
+.filter-group ul {
+  list-style: none;
+  padding: 0;
+}
+
+.filter-group li {
+  cursor: pointer;
+  padding: 0.4rem 0.6rem;
+  border-radius: 5px;
+  transition: background 0.2s;
+}
+
+.filter-group li:hover {
+  background: #e0e0e0;
+}
+
+.filter-group li.active {
+  background: #ff9100;
+  color: #fff;
+  font-weight: bold;
+}

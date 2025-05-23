@@ -1,4 +1,7 @@
 let showSavedOnly = false;
+let currentPapers = [];
+let activeJournal = null;
+let activeDiscipline = null;
 
 function renderPapers(papers, container) {
   const saved = new Set(JSON.parse(localStorage.getItem("savedDOIs") || "[]"));
@@ -6,6 +9,8 @@ function renderPapers(papers, container) {
 
   papers.forEach(paper => {
     if (showSavedOnly && !saved.has(paper.doi)) return;
+    if (activeJournal && paper.journal !== activeJournal) return;
+    if (activeDiscipline && paper.discipline !== activeDiscipline) return;
 
     const div = document.createElement("div");
     div.className = "paper";
@@ -49,12 +54,58 @@ function renderPapers(papers, container) {
   });
 }
 
-let currentPapers = [];
+function renderSidebarFilters(papers) {
+  const journalSet = new Set();
+  const disciplineSet = new Set();
+
+  papers.forEach(p => {
+    if (p.journal) journalSet.add(p.journal);
+    if (p.discipline) disciplineSet.add(p.discipline);
+  });
+
+  const journalList = document.getElementById("journal-filter");
+  const disciplineList = document.getElementById("discipline-filter");
+
+  journalList.innerHTML = "";
+  disciplineList.innerHTML = "";
+
+  [...journalSet].sort().forEach(journal => {
+    const li = document.createElement("li");
+    li.textContent = journal;
+    li.addEventListener("click", () => {
+      activeJournal = activeJournal === journal ? null : journal;
+      renderPapers(currentPapers, document.getElementById("papers"));
+      updateSidebarSelection();
+    });
+    journalList.appendChild(li);
+  });
+
+  [...disciplineSet].sort().forEach(discipline => {
+    const li = document.createElement("li");
+    li.textContent = discipline;
+    li.addEventListener("click", () => {
+      activeDiscipline = activeDiscipline === discipline ? null : discipline;
+      renderPapers(currentPapers, document.getElementById("papers"));
+      updateSidebarSelection();
+    });
+    disciplineList.appendChild(li);
+  });
+
+  function updateSidebarSelection() {
+    document.querySelectorAll("#journal-filter li").forEach(li => {
+      li.classList.toggle("active", li.textContent === activeJournal);
+    });
+    document.querySelectorAll("#discipline-filter li").forEach(li => {
+      li.classList.toggle("active", li.textContent === activeDiscipline);
+    });
+  }
+}
 
 fetch("papers.json")
   .then(res => res.json())
   .then(papers => {
     currentPapers = papers;
+    renderSidebarFilters(papers);
     renderPapers(papers, document.getElementById("papers"));
 
     document.getElementById("search").addEventListener("input", (e) => {

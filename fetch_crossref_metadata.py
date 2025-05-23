@@ -172,14 +172,30 @@ def load_existing_articles(path, days_to_keep):
 def fetch_openalex_data(doi):
     import requests
     from urllib.parse import quote
+    import time
+
     api_url = f"https://api.openalex.org/works/https://doi.org/{quote(doi)}"
-    try:
-        r = requests.get(api_url, timeout=15)
-        r.raise_for_status()
-        return r.json()
-    except Exception as e:
-        if "404" not in str(e): print(f"⚠️ OpenAlex fetch failed for {doi}: {e}")
-        return None
+    for attempt in range(5):  # Up to 5 retries
+        try:
+            time.sleep(1.5 * (2 ** attempt))  # Exponential backoff
+            r = requests.get(api_url, timeout=15)
+            r.raise_for_status()
+            return r.json()
+        except requests.exceptions.HTTPError as e:
+            if r.status_code == 429:
+                print(f"⚠️ Rate limited. Retrying {doi} (attempt {attempt + 1})...")
+                continue
+            elif "404" in str(e):
+                return None
+            else:
+                print(f"⚠️ OpenAlex fetch failed for {doi}: {e}")
+                return None
+        except Exception as e:
+            print(f"⚠️ OpenAlex fetch failed for {doi}: {e}")
+            return None
+    print(f"❌ Failed to fetch OpenAlex data for {doi} after multiple attempts.")
+    return None
+
 
 def extract_abstract_from_openalex(oa_data):
     try:

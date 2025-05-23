@@ -102,16 +102,6 @@ main#papers {
   flex: 1;
 }
 
-#sidebar {
-  width: 260px;
-  background: #f6f6f6;
-  border-radius: 10px;
-  padding: 1rem;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
 .filter-group {
   margin-bottom: 1.5rem;
 }
@@ -280,4 +270,36 @@ main#papers {
 
 .load-more:hover {
   background: #ffa733;
+}
+/* Sidebar filter list as tags */
+#journal-filter li,
+#discipline-filter li {
+  list-style: none;
+  padding: 0.4rem 0.6rem;
+  margin: 0.2rem 0;
+  background: #f1f1f1;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+#journal-filter li:hover,
+#discipline-filter li:hover {
+  background: #e0e0e0;
+}
+
+#journal-filter li.active,
+#discipline-filter li.active {
+  background: #ff9100;
+  color: white;
+  font-weight: bold;
+}
+
+.sidebar-box ul {
+  padding-left: 0;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }

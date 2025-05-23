@@ -1,0 +1,32 @@
+name: Daily Paper Fetch
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Runs every day at 06:00 UTC
+  workflow_dispatch:     # Allows manual run from GitHub
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run fetch script
+        run: python fetch_crossref_metadata_final.py
+
+      - name: Commit new papers.json
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add papers.json
+          git commit -m "Update papers.json from daily fetch" || echo "No changes"
+          git push

@@ -9,9 +9,17 @@ function renderPapers(papers, container) {
   const saved = new Set(JSON.parse(localStorage.getItem("savedDOIs") || "[]"));
   container.innerHTML = "";
 
+  const isFutureDate = (paper) => {
+    const { year, month = 1, day = 1 } = paper.date || {};
+    const pubDate = new Date(year, month - 1, day);
+    const today = new Date();
+    return pubDate > today;
+  };
+
   let shown = 0;
 
   papers.forEach(paper => {
+    if (isFutureDate(paper)) return;
     if (showSavedOnly && !saved.has(paper.doi)) return;
     if (activeJournal && paper.journal !== activeJournal) return;
     if (activeDiscipline && paper.discipline !== activeDiscipline) return;
@@ -49,7 +57,9 @@ function renderPapers(papers, container) {
     container.appendChild(div);
   });
 
+  // ⬇️ This also needs the future date check
   const filtered = papers.filter(paper => {
+    if (isFutureDate(paper)) return false;
     if (showSavedOnly && !saved.has(paper.doi)) return false;
     if (activeJournal && paper.journal !== activeJournal) return false;
     if (activeDiscipline && paper.discipline !== activeDiscipline) return false;

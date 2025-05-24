@@ -1,52 +1,36 @@
-body {
-  font-family: 'Segoe UI', Tahoma, sans-serif;
-  background: linear-gradient(135deg, #e0f7fa, #fff3e0); /* light blue to light orange */
-  color: #333;
-  padding: 2rem;
+html, body {
   margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background: linear-gradient(to right, #d0e7ff 0%, #e0f7fa 100%);
+  color: #333;
+  overflow-x: hidden;
+  position: relative;
+  z-index: 0;
 }
 
+/* Header and layout */
 #logo {
-  height: 180px; 
-  margin-bottom: 1rem;
+  height: 180px;
+  margin-bottom: 0.5rem;
   filter: drop-shadow(0 0 8px #ff9100);
 }
 
-
-header, footer {
+header {
   text-align: center;
-  margin-bottom: 2rem;
+  font-family: Georgia, 'Times New Roman', serif;
 }
 
 .subtitle {
-  color: #bbb;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #222; /* much darker than #bbb */
+  margin-top: 0;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
-.paper {
-  background: #ffffff;
-  color: #000;
-  padding: 1.2rem;
-  margin: 1.2rem auto;
-  border-radius: 10px;
-  max-width: 1000px; /* wider cards */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.paper:hover {
-  transform: scale(1.01);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-
-a {
-  color: #64b5f6;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
+/* Controls */
 .controls {
   display: flex;
   justify-content: center;
@@ -57,9 +41,9 @@ a:hover {
 #search {
   padding: 0.5rem;
   width: 60%;
-  background: #222;
-  color: #eee;
-  border: 1px solid #444;
+  background: #fff;
+  color: #333;
+  border: 1px solid #ccc;
   border-radius: 5px;
 }
 
@@ -77,6 +61,24 @@ a:hover {
 #toggle-saved:hover {
   background: #ffa733;
 }
+
+/* Paper cards */
+.paper {
+  background: #ffffff;
+  color: #000;
+  padding: 1.2rem;
+  margin: 1.2rem auto;
+  border-radius: 10px;
+  max-width: 1000px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.paper:hover {
+  transform: scale(1.01);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
 .save-btn {
   background: #f1f1f1;
   border: 1px solid #ccc;
@@ -91,89 +93,6 @@ a:hover {
   background: #ffefcc;
 }
 
-.layout {
-  display: flex;
-  gap: 2rem;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-main#papers {
-  flex: 1;
-}
-
-.filter-group {
-  margin-bottom: 1.5rem;
-}
-
-.filter-group h3 {
-  margin-top: 0;
-  font-size: 1.1rem;
-  color: #444;
-}
-
-.filter-group ul {
-  list-style: none;
-  padding: 0;
-}
-
-.filter-group li {
-  cursor: pointer;
-  padding: 0.4rem 0.6rem;
-  border-radius: 5px;
-  transition: background 0.2s;
-}
-
-.filter-group li:hover {
-  background: #e0e0e0;
-}
-
-.filter-group li.active {
-  background: #ff9100;
-  color: #fff;
-  font-weight: bold;
-}
-/* Layout wrapper for content and sidebar */
-.main-container {
-  display: flex;
-  gap: 2rem;
-  align-items: flex-start;
-  justify-content: center;
-}
-
-/* Sidebar container */
-#sidebar {
-  width: 250px;
-}
-
-.sidebar-box {
-  background: #fff;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
-}
-
-.sidebar-box h3 {
-  margin-top: 0;
-  font-size: 1.1rem;
-}
-
-/* Search bar */
-#search {
-  padding: 0.5rem;
-  width: 60%;
-  background: #fff;
-  color: #333;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-/* Paper card spacing */
-#papers {
-  flex: 1;
-  max-width: 850px;
-}
 .load-more {
   display: block;
   margin: 2rem auto;
@@ -190,7 +109,8 @@ main#papers {
 .load-more:hover {
   background: #ffa733;
 }
-/* Layout adjustments */
+
+/* Main layout */
 .main-container {
   display: flex;
   gap: 2rem;
@@ -198,7 +118,7 @@ main#papers {
   justify-content: center;
 }
 
-/* Sidebar styling */
+/* Sidebar */
 #sidebar {
   position: sticky;
   top: 2rem;
@@ -220,58 +140,14 @@ main#papers {
   font-size: 1.1rem;
 }
 
-.filter-item {
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  margin: 2px 0;
-  border-radius: 5px;
+.sidebar-box ul {
+  padding-left: 0;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.filter-item:hover {
-  background-color: #f0f0f0;
-}
-
-.filter-item.active {
-  background-color: #ff9100;
-  color: white;
-  font-weight: bold;
-}
-
-/* Paper card styling */
-.paper {
-  background: #ffffff;
-  color: #000;
-  padding: 1rem;
-  margin: 1rem auto;
-  border-radius: 10px;
-  max-width: 850px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.paper:hover {
-  transform: scale(1.01);
-  box-shadow: 0 0 14px rgba(0,0,0,0.15);
-}
-
-/* Load more button */
-.load-more {
-  display: block;
-  margin: 2rem auto;
-  padding: 0.6rem 1.2rem;
-  background: #ff9100;
-  color: black;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.load-more:hover {
-  background: #ffa733;
-}
-/* Sidebar filter list as tags */
 #journal-filter li,
 #discipline-filter li {
   list-style: none;
@@ -296,10 +172,12 @@ main#papers {
   font-weight: bold;
 }
 
-.sidebar-box ul {
-  padding-left: 0;
-  margin-top: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+/* Links */
+a {
+  color: #64b5f6;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }

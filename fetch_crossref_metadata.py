@@ -81,7 +81,7 @@ JOURNALS = {
     "JACS Au": ("2691-3704", "General"),
 }
 
-MAX_ARTICLES_PER_JOURNAL = 20
+MAX_ARTICLES_PER_JOURNAL = 50
 OUTPUT_FILE = "papers.json"
 DAYS_TO_KEEP = 60
 
@@ -106,7 +106,8 @@ def article_is_recent(article, cutoff_date):
     try:
         d = article.get("date", {})
         pub_date = datetime(d["year"], d.get("month", 1), d.get("day", 1))
-        return pub_date >= cutoff_date
+        now = datetime.utcnow()
+        return cutoff_date <= pub_date <= now
     except:
         return False
 
@@ -175,7 +176,7 @@ def fetch_openalex_data(doi):
     import time
 
     api_url = f"https://api.openalex.org/works/https://doi.org/{quote(doi)}"
-    for attempt in range(2): 
+    for attempt in range(1): 
         try:
             time.sleep(1.5 * (2 ** attempt))  # Exponential backoff
             r = requests.get(api_url, timeout=15)

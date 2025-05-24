@@ -144,16 +144,21 @@ def format_article(article, journal_name, discipline):
         "discipline": discipline,
         "date": extract_date(article)
     }
+
     if "abstract" in article:
         entry["abstract"] = clean_abstract(article["abstract"])
 
     oa_data = fetch_openalex_data(entry["doi"])
-    if not entry.get("abstract") and oa_data:
-        oa_abstract = extract_abstract_from_openalex(oa_data)
-        if oa_abstract:
-            entry["abstract"] = oa_abstract
-    entry["concepts"] = extract_concepts_from_openalex(oa_data) if oa_data else []
-    return entry
+    if oa_data:
+        if not entry.get("abstract"):
+            oa_abstract = extract_abstract_from_openalex(oa_data)
+            if oa_abstract:
+                entry["abstract"] = oa_abstract
+        entry["concepts"] = extract_concepts_from_openalex(oa_data)
+    else:
+        entry["concepts"] = []
+
+    return entry 
 
 def load_existing_articles(path, days_to_keep):
     if not os.path.exists(path):

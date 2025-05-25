@@ -4,9 +4,11 @@
   <meta charset="UTF-8" />
   <title>ChemPaperFeed</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <canvas id="background-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;"></canvas>
   <!-- Main site content -->
   <header>
     <img src="logo.png" alt="ChemPaperFeed logo" id="logo" />
@@ -14,7 +16,15 @@
   </header>
 
   <div class="controls">
-    <input type="text" id="search" placeholder="Search papers..." />
+    <input type="text" id="search" placeholder="Search papers..." autocomplete="off" />
+    <select id="sort-method">
+      <option value="newest">Newest</option>
+      <option value="oldest">Oldest</option>
+      <option value="az">A–Z (Title)</option>
+      <option value="za">Z–A (Title)</option>
+      <option value="journal">Journal (A–Z)</option>
+      <option value="discipline">Discipline (A–Z)</option>
+    </select>
     <button id="toggle-saved">Show Saved</button>
   </div>
 
@@ -37,6 +47,7 @@
     <p>Powered by Crossref · Built by Miguel Mateus</p>
   </footer>
 
+  <script src="background.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

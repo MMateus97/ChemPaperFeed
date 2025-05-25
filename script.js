@@ -4,6 +4,43 @@ let showSavedOnly = false;
 let currentPapers = [];
 let activeJournal = null;
 let activeDiscipline = null;
+let currentSortMethod = "newest"; // Track selected sort
+
+function sortPapers(papers, method) {
+  // Defensive copy
+  let arr = [...papers];
+  switch (method) {
+    case "newest":
+      arr.sort((a, b) => {
+        const dateA = new Date(`${a.date?.year || 0}-${a.date?.month || 1}-${a.date?.day || 1}`);
+        const dateB = new Date(`${b.date?.year || 0}-${b.date?.month || 1}-${b.date?.day || 1}`);
+        return dateB - dateA;
+      });
+      break;
+    case "oldest":
+      arr.sort((a, b) => {
+        const dateA = new Date(`${a.date?.year || 0}-${a.date?.month || 1}-${a.date?.day || 1}`);
+        const dateB = new Date(`${b.date?.year || 0}-${b.date?.month || 1}-${b.date?.day || 1}`);
+        return dateA - dateB;
+      });
+      break;
+    case "az":
+      arr.sort((a, b) => (a.title || "").localeCompare(b.title || "", undefined, { sensitivity: "base" }));
+      break;
+    case "za":
+      arr.sort((a, b) => (b.title || "").localeCompare(a.title || "", undefined, { sensitivity: "base" }));
+      break;
+    case "journal":
+      arr.sort((a, b) => (a.journal || "").localeCompare(b.journal || "", undefined, { sensitivity: "base" }));
+      break;
+    case "discipline":
+      arr.sort((a, b) => (a.discipline || "").localeCompare(b.discipline || "", undefined, { sensitivity: "base" }));
+      break;
+    default:
+      break;
+  }
+  return arr;
+}
 
 function renderPapers(papers, container) {
   const saved = new Set(JSON.parse(localStorage.getItem("savedDOIs") || "[]"));
@@ -18,7 +55,10 @@ function renderPapers(papers, container) {
 
   let shown = 0;
 
-  papers.forEach(paper => {
+  // Sort papers before rendering
+  const sortedPapers = sortPapers(papers, currentSortMethod);
+
+  sortedPapers.forEach(paper => {
     if (isFutureDate(paper)) return;
     if (showSavedOnly && !saved.has(paper.doi)) return;
     if (activeJournal && paper.journal !== activeJournal) return;
@@ -58,7 +98,7 @@ function renderPapers(papers, container) {
   });
 
   // ⬇️ This also needs the future date check
-  const filtered = papers.filter(paper => {
+  const filtered = sortedPapers.filter(paper => {
     if (isFutureDate(paper)) return false;
     if (showSavedOnly && !saved.has(paper.doi)) return false;
     if (activeJournal && paper.journal !== activeJournal) return false;
@@ -143,16 +183,20 @@ function renderSidebarFilters(papers) {
   }
 }
 
+// Utility to retrieve saved papers
+function getSavedPapers() {
+  try {
+    const saved = localStorage.getItem("savedPapers");
+    return saved ? JSON.parse(saved) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
 fetch("papers.json")
   .then(res => res.json())
   .then(papers => {
-    // Sort papers by date (newest to oldest)
-    papers.sort((a, b) => {
-      const dateA = new Date(`${a.date?.year || 0}-${a.date?.month || 1}-${a.date?.day || 1}`);
-      const dateB = new Date(`${b.date?.year || 0}-${b.date?.month || 1}-${b.date?.day || 1}`);
-      return dateB - dateA;
-    });
-
+    // Remove initial sort, sorting is now handled by sortPapers()
     currentPapers = papers;
     renderSidebarFilters(papers);
     renderPapers(papers, document.getElementById("papers"));
@@ -169,9 +213,30 @@ fetch("papers.json")
       renderPapers(filtered, document.getElementById("papers"));
     });
 
+    // Update the click handler for "toggle-saved"
+    document.getElementById("toggle-saved")?.addEventListener("click", () => {
+      const container = document.getElementById("papers");
+      if (!container) return;
+      const savedPapers = getSavedPapers();
+      container.innerHTML = "";
+      if (!Array.isArray(savedPapers) || savedPapers.length === 0) {
+        container.innerHTML = "<p style='color:#b0b6be;text-align:center;'>Don't have any saved, explore more</p>";
+      } else {
+        // ...existing code to render saved paper cards...
+        renderPapers(savedPapers, container, savedPapers);
+      }
+    });
+
     document.getElementById("toggle-saved").addEventListener("click", () => {
       showSavedOnly = !showSavedOnly;
       document.getElementById("toggle-saved").textContent = showSavedOnly ? "Show All" : "Show Saved";
+      papersShown = papersPerLoad;
+      renderPapers(currentPapers, document.getElementById("papers"));
+    });
+
+    // Add sort dropdown handler
+    document.getElementById("sort-method").addEventListener("change", (e) => {
+      currentSortMethod = e.target.value;
       papersShown = papersPerLoad;
       renderPapers(currentPapers, document.getElementById("papers"));
     });

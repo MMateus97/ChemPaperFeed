@@ -8,6 +8,7 @@ on:
 jobs:
   fetch:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -27,8 +28,7 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git pull origin main --no-rebase
           git add papers.json
           git commit -m "Update papers.json from daily fetch" || echo "No changes to commit"
+          git pull --rebase origin main
           git push origin main
-

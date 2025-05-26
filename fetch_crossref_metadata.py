@@ -200,7 +200,7 @@ def fetch_openalex_data(doi):
     for attempt in range(1): 
         try:
             time.sleep(1.5 * (2 ** attempt))  # Exponential backoff
-            r = requests.get(api_url, timeout=15)
+            r = requests.get(api_url, timeout=20)
             r.raise_for_status()
             return r.json()
         except requests.exceptions.HTTPError as e:

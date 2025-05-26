@@ -7,7 +7,6 @@ let activeDiscipline = null;
 let currentSortMethod = "newest"; // Track selected sort
 
 function sortPapers(papers, method) {
-  // Defensive copy
   let arr = [...papers];
   switch (method) {
     case "newest":
@@ -55,7 +54,6 @@ function renderPapers(papers, container) {
 
   let shown = 0;
 
-  // Sort papers before rendering
   const sortedPapers = sortPapers(papers, currentSortMethod);
 
   sortedPapers.forEach(paper => {
@@ -69,9 +67,6 @@ function renderPapers(papers, container) {
 
     const div = document.createElement("div");
     div.className = "paper";
-
-    const dateObj = paper.date || {};
-    const dateString = [dateObj.year, dateObj.month, dateObj.day].filter(Boolean).join("-") || "n/a";
 
     const abstractHTML = paper.abstract
       ? `<details><summary>Read more</summary><p>${paper.abstract}</p></details>`
@@ -87,7 +82,8 @@ function renderPapers(papers, container) {
     div.innerHTML = `
       <h3><a href="${paper.link}" target="_blank" rel="noopener noreferrer">${paper.title}</a></h3>
       <p><strong>Authors:</strong> ${paper.authors}</p>
-      <p><strong>Journal:</strong> ${paper.journal} (${dateString})</p>
+      <p><strong>Journal:</strong> ${paper.journal}</p>
+      <p><strong>Publication date:</strong> ${paper.publication_date_str || "n/a"}</p>
       <p><strong>Discipline:</strong> ${paper.discipline}</p>
       ${conceptsHTML}
       ${abstractHTML}
@@ -97,7 +93,6 @@ function renderPapers(papers, container) {
     container.appendChild(div);
   });
 
-  // ⬇️ This also needs the future date check
   const filtered = sortedPapers.filter(paper => {
     if (isFutureDate(paper)) return false;
     if (showSavedOnly && !saved.has(paper.doi)) return false;
@@ -183,20 +178,9 @@ function renderSidebarFilters(papers) {
   }
 }
 
-// Utility to retrieve saved papers
-function getSavedPapers() {
-  try {
-    const saved = localStorage.getItem("savedPapers");
-    return saved ? JSON.parse(saved) : [];
-  } catch (e) {
-    return [];
-  }
-}
-
 fetch("papers.json")
   .then(res => res.json())
   .then(papers => {
-    // Remove initial sort, sorting is now handled by sortPapers()
     currentPapers = papers;
     renderSidebarFilters(papers);
     renderPapers(papers, document.getElementById("papers"));
@@ -213,20 +197,6 @@ fetch("papers.json")
       renderPapers(filtered, document.getElementById("papers"));
     });
 
-    // Update the click handler for "toggle-saved"
-    document.getElementById("toggle-saved")?.addEventListener("click", () => {
-      const container = document.getElementById("papers");
-      if (!container) return;
-      const savedPapers = getSavedPapers();
-      container.innerHTML = "";
-      if (!Array.isArray(savedPapers) || savedPapers.length === 0) {
-        container.innerHTML = "<p style='color:#b0b6be;text-align:center;'>Don't have any saved, explore more</p>";
-      } else {
-        // ...existing code to render saved paper cards...
-        renderPapers(savedPapers, container, savedPapers);
-      }
-    });
-
     document.getElementById("toggle-saved").addEventListener("click", () => {
       showSavedOnly = !showSavedOnly;
       document.getElementById("toggle-saved").textContent = showSavedOnly ? "Show All" : "Show Saved";
@@ -234,7 +204,6 @@ fetch("papers.json")
       renderPapers(currentPapers, document.getElementById("papers"));
     });
 
-    // Add sort dropdown handler
     document.getElementById("sort-method").addEventListener("change", (e) => {
       currentSortMethod = e.target.value;
       papersShown = papersPerLoad;
@@ -242,6 +211,6 @@ fetch("papers.json")
     });
   })
   .catch(err => {
-    document.getElementById("papers").innerHTML = `<p>Failed to load papers. Try refreshing.</p>`;
+    document.getElementById("papers").innerHTML = "<p>Failed to load papers. Try refreshing.</p>";
     console.error("Error loading papers:", err);
   });

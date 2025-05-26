@@ -132,7 +132,7 @@ def fetch_articles(issn, count):
         "filter": "type:journal-article"
     }
     try:
-        r = requests.get(url, params=params, headers={"User-Agent": "ChemPaperFeed/1.0 (mailto:your-email@example.com)"}, timeout=20)
+        r = requests.get(url, params=params, headers={"User-Agent": "ChemPaperFeed/1.0 (mailto:your-email@example.com)"}, timeout=40)
         r.raise_for_status()
         return r.json()["message"]["items"]
     except Exception as e:

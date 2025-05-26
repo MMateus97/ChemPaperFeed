@@ -8,9 +8,9 @@ import os
 
 JOURNALS = {
     "Nature Chemistry": ("1755-4330", "General"),
-    "Chemical Reviews": ("0009-2665", "General"),
+    "Chemical Reviews": ("0009-2665", "Review"),
     "Accounts of Chemical Research": ("0001-4842", "General"),
-    "Nature Catalysis": ("2520-1158", "General"),
+    "Nature Catalysis": ("2520-1158", "Catalysis"),
     "Chem": ("2451-9294", "General"),
     "Chemical Science": ("2041-6520", "General"),
     "Angewandte Chemie International Edition": ("1521-3773", "General"),
@@ -26,9 +26,9 @@ JOURNALS = {
     "Tetrahedron": ("0040-4020", "Organic"),
     "Tetrahedron Letters": ("0040-4039", "Organic"),
     "Organic & Biomolecular Chemistry": ("1477-0520", "Organic"),
-    "Advanced Synthesis & Catalysis": ("1615-4150", "Organic"),
-    "Organometallics": ("0276-7333", "Catalysis"),
-    "Dalton Transactions": ("1477-9226", "Catalysis"),
+    "Advanced Synthesis & Catalysis": ("1615-4150", "Catalysis"),
+    "Organometallics": ("0276-7333", "Inorganic"),
+    "Dalton Transactions": ("1477-9226", "Inorganic"),
     "Catalysis Science & Technology": ("2044-4753", "Catalysis"),
     "ACS Catalysis": ("2155-5435", "Catalysis"),
     "Journal of Catalysis": ("0021-9517", "Catalysis"),
@@ -47,11 +47,11 @@ JOURNALS = {
     "ACS Sustainable Chemistry & Engineering": ("2168-0485", "Green"),
     "ChemSusChem": ("1864-5631", "Green"),
     "Journal of Cleaner Production": ("0959-6526", "Green"),
-    "New Journal of Chemistry": ("1144-0546", "Specialized"),
+    "New Journal of Chemistry": ("1144-0546", "General"),
     "Crystal Growth & Design": ("1528-7483", "Specialized"),
-    "Molecules": ("1420-3049", "Specialized"),
-    "RSC Advances": ("2046-2069", "Specialized"),
-    "Frontiers in Chemistry": ("2296-2646", "Specialized"),
+    "Molecules": ("1420-3049", "General"),
+    "RSC Advances": ("2046-2069", "General"),
+    "Frontiers in Chemistry": ("2296-2646", "General"),
     "Chemical Society Reviews": ("0306-0012", "Review"),
     "Chemistry – An Asian Journal": ("1861-4728", "Review"),
     "Nature Reviews Chemistry": ("2397-3358", "Review"),
@@ -59,9 +59,9 @@ JOURNALS = {
     "Comprehensive Reviews in Analytical Chemistry": ("0734-2608", "Review"),
     "Science": ("0036-8075", "General"),
     "Nature": ("0028-0836", "General"),
-    "Nature Communications": ("2041-1723", "Interdisciplinary"),
+    "Nature Communications": ("2041-1723", "General"),
     "Science Advances": ("2375-2548", "General"),
-    "Nature Synthesis": ("2731-0582", "Organic/Synthetic"),
+    "Nature Synthesis": ("2731-0582", "Organic"),
     "ACS Photonics": ("2330-4022", "Photochemistry"),
     "ACS Omega": ("2470-1343", "General"),
     "Chemistry–Select": ("2365-6549", "General"),
@@ -101,6 +101,7 @@ def extract_date(article):
         "month": date[1] if len(date) > 1 else None,
         "day": date[2] if len(date) > 2 else None
     }
+    
 
 def article_is_recent(article, cutoff_date):
     try:
@@ -120,7 +121,7 @@ def fetch_articles(issn, count):
         "filter": "type:journal-article"
     }
     try:
-        r = requests.get(url, params=params, headers={"User-Agent": "ChemPaperFeed/1.0 (mailto:your-email@example.com)"}, timeout=10)
+        r = requests.get(url, params=params, headers={"User-Agent": "ChemPaperFeed/1.0 (mailto:your-email@example.com)"}, timeout=16)
         r.raise_for_status()
         return r.json()["message"]["items"]
     except Exception as e:
@@ -132,6 +133,9 @@ def format_article(article, journal_name, discipline):
         return None
     if not article.get("author"):
         return None
+
+    date_obj = extract_date(article)
+
     entry = {
         "title": title,
         "authors": ", ".join([
@@ -142,7 +146,8 @@ def format_article(article, journal_name, discipline):
         "link": f"https://doi.org/{article['DOI']}" if "DOI" in article else None,
         "journal": journal_name,
         "discipline": discipline,
-        "date": extract_date(article)
+        "date": date_obj,
+        "publication_date_str": format_date_string(date_obj)
     }
 
     if "abstract" in article:
@@ -158,7 +163,7 @@ def format_article(article, journal_name, discipline):
     else:
         entry["concepts"] = []
 
-    return entry 
+    return entry
 
 def load_existing_articles(path, days_to_keep):
     if not os.path.exists(path):

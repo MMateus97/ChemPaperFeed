@@ -8,9 +8,9 @@ import os
 
 JOURNALS = {
     "Nature Chemistry": ("1755-4330", "General"),
-    "Chemical Reviews": ("0009-2665", "Review"),
+    "Chemical Reviews": ("0009-2665", "General"),
     "Accounts of Chemical Research": ("0001-4842", "General"),
-    "Nature Catalysis": ("2520-1158", "Catalysis"),
+    "Nature Catalysis": ("2520-1158", "General"),
     "Chem": ("2451-9294", "General"),
     "Chemical Science": ("2041-6520", "General"),
     "Angewandte Chemie International Edition": ("1521-3773", "General"),
@@ -26,9 +26,9 @@ JOURNALS = {
     "Tetrahedron": ("0040-4020", "Organic"),
     "Tetrahedron Letters": ("0040-4039", "Organic"),
     "Organic & Biomolecular Chemistry": ("1477-0520", "Organic"),
-    "Advanced Synthesis & Catalysis": ("1615-4150", "Catalysis"),
-    "Organometallics": ("0276-7333", "Inorganic"),
-    "Dalton Transactions": ("1477-9226", "Inorganic"),
+    "Advanced Synthesis & Catalysis": ("1615-4150", "Organic"),
+    "Organometallics": ("0276-7333", "Catalysis"),
+    "Dalton Transactions": ("1477-9226", "Catalysis"),
     "Catalysis Science & Technology": ("2044-4753", "Catalysis"),
     "ACS Catalysis": ("2155-5435", "Catalysis"),
     "Journal of Catalysis": ("0021-9517", "Catalysis"),
@@ -47,11 +47,11 @@ JOURNALS = {
     "ACS Sustainable Chemistry & Engineering": ("2168-0485", "Green"),
     "ChemSusChem": ("1864-5631", "Green"),
     "Journal of Cleaner Production": ("0959-6526", "Green"),
-    "New Journal of Chemistry": ("1144-0546", "General"),
+    "New Journal of Chemistry": ("1144-0546", "Specialized"),
     "Crystal Growth & Design": ("1528-7483", "Specialized"),
-    "Molecules": ("1420-3049", "General"),
-    "RSC Advances": ("2046-2069", "General"),
-    "Frontiers in Chemistry": ("2296-2646", "General"),
+    "Molecules": ("1420-3049", "Specialized"),
+    "RSC Advances": ("2046-2069", "Specialized"),
+    "Frontiers in Chemistry": ("2296-2646", "Specialized"),
     "Chemical Society Reviews": ("0306-0012", "Review"),
     "Chemistry – An Asian Journal": ("1861-4728", "Review"),
     "Nature Reviews Chemistry": ("2397-3358", "Review"),
@@ -59,9 +59,9 @@ JOURNALS = {
     "Comprehensive Reviews in Analytical Chemistry": ("0734-2608", "Review"),
     "Science": ("0036-8075", "General"),
     "Nature": ("0028-0836", "General"),
-    "Nature Communications": ("2041-1723", "General"),
+    "Nature Communications": ("2041-1723", "Interdisciplinary"),
     "Science Advances": ("2375-2548", "General"),
-    "Nature Synthesis": ("2731-0582", "Organic"),
+    "Nature Synthesis": ("2731-0582", "Organic/Synthetic"),
     "ACS Photonics": ("2330-4022", "Photochemistry"),
     "ACS Omega": ("2470-1343", "General"),
     "Chemistry–Select": ("2365-6549", "General"),
@@ -84,6 +84,19 @@ JOURNALS = {
 MAX_ARTICLES_PER_JOURNAL = 25
 OUTPUT_FILE = "papers.json"
 DAYS_TO_KEEP = 60
+
+def format_date_string(date):
+    try:
+        day = date.get("day", 1)
+        month = date.get("month", 1)
+        year = date.get("year")
+        if not year:
+            return "n/a"
+        suffix = "th" if 11 <= day <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
+        month_name = datetime(year, month, 1).strftime("%B")
+        return f"{day}{suffix} {month_name} {year}"
+    except:
+        return "n/a"
 
 def clean_abstract(jats_text):
     text = unescape(jats_text)
@@ -121,7 +134,7 @@ def fetch_articles(issn, count):
         "filter": "type:journal-article"
     }
     try:
-        r = requests.get(url, params=params, headers={"User-Agent": "ChemPaperFeed/1.0 (mailto:your-email@example.com)"}, timeout=16)
+        r = requests.get(url, params=params, headers={"User-Agent": "ChemPaperFeed/1.0 (mailto:your-email@example.com)"}, timeout=10)
         r.raise_for_status()
         return r.json()["message"]["items"]
     except Exception as e:

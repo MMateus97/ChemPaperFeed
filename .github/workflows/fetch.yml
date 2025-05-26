@@ -23,11 +23,12 @@ jobs:
       - name: Run fetch script
         run: python fetch_crossref_metadata.py
 
-
-      - name: Commit new papers.json
+      - name: Commit and push papers.json safely
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
+          git fetch origin main
+          git rebase origin/main
           git add papers.json
-          git commit -m "Update papers.json from daily fetch" || echo "No changes"
-          git push
+          git commit -m "Update papers.json from daily fetch" || echo "No changes to commit"
+          git push origin main
